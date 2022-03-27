@@ -102,13 +102,11 @@ img {
 type Epub struct {
 	sync.Mutex
 	*http.Client
-	author string
-	cover  *epubCover
+	cover *epubCover
 	// The key is the css filename, the value is the css source
 	css map[string]string
 	// The key is the font filename, the value is the font source
-	fonts      map[string]string
-	identifier string
+	fonts map[string]string
 	// The key is the image filename, the value is the image source
 	images map[string]string
 	// The key is the video filename, the value is the video source
@@ -120,9 +118,8 @@ type Epub struct {
 	// Page progression direction
 	ppd string
 	// The package file (package.opf)
-	pkg      *pkg
+	Pkg      *Pkg
 	sections []epubSection
-	title    string
 	// Table of contents
 	toc *toc
 }
@@ -153,11 +150,11 @@ func NewEpub(title string) *Epub {
 	e.fonts = make(map[string]string)
 	e.images = make(map[string]string)
 	e.videos = make(map[string]string)
-	e.pkg = newPackage()
+	e.Pkg = NewPkg()
 	e.toc = newToc()
 	// Set minimal required attributes
-	e.SetIdentifier(urnUUIDPrefix + uuid.Must(uuid.NewV4()).String())
-	e.SetLang(defaultEpubLang)
+	e.Pkg.AddIdentifier(urnUUIDPrefix+uuid.Must(uuid.NewV4()).String(), SchemeXSDString, PropertyIdentifierTypeUUID)
+	e.Pkg.SetLang(defaultEpubLang)
 	e.SetTitle(title)
 
 	return e
@@ -297,39 +294,6 @@ func (e *Epub) addSection(body string, sectionTitle string, internalFilename str
 	return internalFilename, nil
 }
 
-// Author returns the author of the EPUB.
-func (e *Epub) Author() string {
-	return e.author
-}
-
-// Identifier returns the unique identifier of the EPUB.
-func (e *Epub) Identifier() string {
-	return e.identifier
-}
-
-// Lang returns the language of the EPUB.
-func (e *Epub) Lang() string {
-	return e.lang
-}
-
-// Description returns the description of the EPUB.
-func (e *Epub) Description() string {
-	return e.desc
-}
-
-// Ppd returns the page progression direction of the EPUB.
-func (e *Epub) Ppd() string {
-	return e.ppd
-}
-
-// SetAuthor sets the author of the EPUB.
-func (e *Epub) SetAuthor(author string) {
-	e.Lock()
-	defer e.Unlock()
-	e.author = author
-	e.pkg.setAuthor(author)
-}
-
 // SetCover sets the cover page for the EPUB using the provided image source and
 // optional CSS.
 //
@@ -364,7 +328,7 @@ func (e *Epub) SetCover(internalImagePath string, internalCSSPath string) {
 	}
 
 	e.cover.imageFilename = filepath.Base(internalImagePath)
-	e.pkg.setCover(e.cover.imageFilename)
+	e.Pkg.SetCover(e.cover.imageFilename)
 
 	// Use default cover stylesheet if one isn't provided
 	if internalCSSPath == "" {
@@ -409,53 +373,12 @@ func (e *Epub) SetCover(internalImagePath string, internalCSSPath string) {
 	e.cover.xhtmlFilename = filepath.Base(coverPath)
 }
 
-// SetIdentifier sets the unique identifier of the EPUB, such as a UUID, DOI,
-// ISBN or ISSN. If no identifier is set, a UUID will be automatically
-// generated.
-func (e *Epub) SetIdentifier(identifier string) {
-	e.Lock()
-	defer e.Unlock()
-	e.identifier = identifier
-	e.pkg.setIdentifier(identifier)
-	e.toc.setIdentifier(identifier)
-}
-
-// SetLang sets the language of the EPUB.
-func (e *Epub) SetLang(lang string) {
-	e.Lock()
-	defer e.Unlock()
-	e.lang = lang
-	e.pkg.setLang(lang)
-}
-
-// SetDescription sets the description of the EPUB.
-func (e *Epub) SetDescription(desc string) {
-	e.Lock()
-	defer e.Unlock()
-	e.desc = desc
-	e.pkg.setDescription(desc)
-}
-
-// SetPpd sets the page progression direction of the EPUB.
-func (e *Epub) SetPpd(direction string) {
-	e.Lock()
-	defer e.Unlock()
-	e.ppd = direction
-	e.pkg.setPpd(direction)
-}
-
 // SetTitle sets the title of the EPUB.
 func (e *Epub) SetTitle(title string) {
 	e.Lock()
 	defer e.Unlock()
-	e.title = title
-	e.pkg.setTitle(title)
+	e.Pkg.SetTitle(title)
 	e.toc.setTitle(title)
-}
-
-// Title returns the title of the EPUB.
-func (e *Epub) Title() string {
-	return e.title
 }
 
 // Add a media file to the EPUB and return the path relative to the EPUB section

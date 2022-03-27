@@ -355,7 +355,7 @@ func (e *Epub) writeMedia(rootEpubDir string, mediaMap map[string]string, mediaF
 			}
 
 			// Add the file to the OPF manifest
-			e.pkg.addToManifest(fixXMLId(mediaFilename), filepath.Join(mediaFolderName, mediaFilename), mediaType, mediaProperties)
+			e.Pkg.AddToManifest(fixXMLId(mediaFilename), filepath.Join(mediaFolderName, mediaFilename), mediaType, mediaProperties)
 		}
 	}
 	return nil
@@ -401,7 +401,7 @@ func writeMimetype(rootEpubDir string) {
 }
 
 func (e *Epub) writePackageFile(rootEpubDir string) {
-	e.pkg.write(rootEpubDir)
+	e.Pkg.write(rootEpubDir)
 }
 
 // Write the section files to the temporary directory and add the sections to
@@ -411,13 +411,13 @@ func (e *Epub) writeSections(rootEpubDir string) {
 		// If a cover was set, add it to the package spine first so it shows up
 		// first in the reading order
 		if e.cover.xhtmlFilename != "" {
-			e.pkg.addToSpine(e.cover.xhtmlFilename)
+			e.Pkg.AddToSpine(e.cover.xhtmlFilename)
 		}
 
 		for i, section := range e.sections {
 			// Set the title of the cover page XHTML to the title of the EPUB
 			if section.filename == e.cover.xhtmlFilename {
-				section.xhtml.setTitle(e.Title())
+				section.xhtml.setTitle(e.Pkg.xml.Metadata.Title)
 			}
 
 			sectionFilePath := filepath.Join(rootEpubDir, contentFolderName, xhtmlFolderName, section.filename)
@@ -430,9 +430,9 @@ func (e *Epub) writeSections(rootEpubDir string) {
 			}
 			// The cover page should have already been added to the spine first
 			if section.filename != e.cover.xhtmlFilename {
-				e.pkg.addToSpine(section.filename)
+				e.Pkg.AddToSpine(section.filename)
 			}
-			e.pkg.addToManifest(section.filename, relativePath, mediaTypeXhtml, "")
+			e.Pkg.AddToManifest(section.filename, relativePath, mediaTypeXhtml, "")
 		}
 	}
 }
@@ -440,8 +440,8 @@ func (e *Epub) writeSections(rootEpubDir string) {
 // Write the TOC file to the temporary directory and add the TOC entries to the
 // package file
 func (e *Epub) writeToc(rootEpubDir string) {
-	e.pkg.addToManifest(tocNavItemID, tocNavFilename, mediaTypeXhtml, tocNavItemProperties)
-	e.pkg.addToManifest(tocNcxItemID, tocNcxFilename, mediaTypeNcx, "")
+	e.Pkg.AddToManifest(tocNavItemID, tocNavFilename, mediaTypeXhtml, tocNavItemProperties)
+	e.Pkg.AddToManifest(tocNcxItemID, tocNcxFilename, mediaTypeNcx, "")
 
 	e.toc.write(rootEpubDir)
 }

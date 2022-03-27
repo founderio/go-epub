@@ -126,8 +126,8 @@ func ExampleEpub_SetIdentifier() {
 	e := epub.NewEpub("My title")
 
 	// Set the identifier to a UUID
-	e.SetIdentifier("urn:uuid:a1b0d67e-2e81-4df5-9e67-a64cbe366809")
+	e.Pkg.AddIdentifier("urn:uuid:a1b0d67e-2e81-4df5-9e67-a64cbe366809", epub.SchemeXSDString, epub.PropertyIdentifierTypeUUID)
 
 	// Set the identifier to an ISBN
-	e.SetIdentifier("urn:isbn:9780101010101")
+	e.Pkg.AddIdentifier("urn:isbn:9780101010101", epub.SchemeONIXCodeList5, epub.PropertyIdentifierTypeISBN13)
 }
