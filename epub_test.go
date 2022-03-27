@@ -520,7 +520,7 @@ func testEpubValidity(t testing.TB) {
 	e.AddImage(testImageFromURLSource, "")
 	e.AddImage(testImageFromFileSource, testNumberFilenameStart)
 	e.AddVideo(testVideoFromURLSource, testVideoFromFileFilename)
-	e.Pkg.AddAuthor(testEpubAuthor, PropertyRoleAuthor)
+	e.Pkg.AddCreator(testEpubAuthor, PropertyRoleAuthor)
 	e.SetCover(testImagePath, "")
 	e.Pkg.SetDescription(testEpubDescription)
 	e.Pkg.AddIdentifier(testEpubIdentifier, SchemeXSDString, PropertyIdentifierTypeUUID)

@@ -70,9 +70,9 @@ const (
 )
 
 const (
-	pkgCreatorID    = "creator"
-	pkgPublisherID  = "publisher"
-	pkgIdentifierID = "pub-id"
+	pkgCreatorID     = "creator"
+	pkgContributorID = "contributor"
+	pkgIdentifierID  = "pub-id"
 
 	pkgFileTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 <package version="3.0" unique-identifier="pub-id" xmlns="http://www.idpf.org/2007/opf">
@@ -234,7 +234,7 @@ func (p *Pkg) AddToSpine(id string) {
 	p.xml.Spine.Items = append(p.xml.Spine.Items, *i)
 }
 
-func (p *Pkg) AddAuthor(author, role string) {
+func (p *Pkg) AddCreator(author, role string) {
 	id := fmt.Sprintf("%s%d", pkgCreatorID, len(p.xml.Metadata.Creator))
 
 	p.xml.Metadata.Creator = append(p.xml.Metadata.Creator, PkgCreator{
@@ -252,11 +252,11 @@ func (p *Pkg) AddAuthor(author, role string) {
 	p.xml.Metadata.Meta = updateMeta(p.xml.Metadata.Meta, meta)
 }
 
-func (p *Pkg) AddContributor(author, role string) {
-	id := fmt.Sprintf("%s%d", pkgCreatorID, len(p.xml.Metadata.Creator))
+func (p *Pkg) AddContributor(contributor, role string) {
+	id := fmt.Sprintf("%s%d", pkgContributorID, len(p.xml.Metadata.Contributor))
 
-	p.xml.Metadata.Creator = append(p.xml.Metadata.Creator, PkgCreator{
-		Data: author,
+	p.xml.Metadata.Contributor = append(p.xml.Metadata.Contributor, PkgContributor{
+		Data: contributor,
 		ID:   id,
 	})
 	meta := PkgMeta{
@@ -291,7 +291,7 @@ func (p *Pkg) AddCustomMeta(name, content string) {
 // ISBN or ISSN. If no identifier is set, a UUID will be automatically
 // generated.
 func (p *Pkg) AddIdentifier(identifier, typeSchema, typeContent string) {
-	id := fmt.Sprintf("%s%d", pkgCreatorID, len(p.xml.Metadata.Creator))
+	id := fmt.Sprintf("%s%d", pkgIdentifierID, len(p.xml.Metadata.Identifier))
 
 	p.xml.Metadata.Identifier = append(p.xml.Metadata.Identifier, PkgIdentifier{
 		ID:   id,
