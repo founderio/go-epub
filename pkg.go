@@ -324,7 +324,7 @@ func (p *Pkg) SetSource(source string) {
 }
 
 func (p *Pkg) SetDate(dt time.Time) {
-	p.xml.Metadata.Date = dt.Format(time.RFC3339)
+	p.xml.Metadata.Date = dt.UTC().Format(time.RFC3339)
 }
 
 func (p *Pkg) SetSubject(subject []string) {
