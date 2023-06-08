@@ -135,8 +135,9 @@ type PkgIdentifier struct {
 
 // <item> elements, one per each file stored in the EPUB
 // Ex: <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
-//     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
-//     <item id="section0001.xhtml" href="xhtml/section0001.xhtml" media-type="application/xhtml+xml" />
+//
+//	<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+//	<item id="section0001.xhtml" href="xhtml/section0001.xhtml" media-type="application/xhtml+xml" />
 type PkgItem struct {
 	ID         string `xml:"id,attr"`
 	Href       string `xml:"href,attr"`
@@ -153,7 +154,8 @@ type PkgItemref struct {
 // The <meta> element, which contains modified date, role of the creator (e.g.
 // author), etc
 // Ex: <meta refines="#creator" property="role" scheme="marc:relators" id="role">aut</meta>
-//     <meta property="dcterms:modified">2011-01-01T12:00:00Z</meta>
+//
+//	<meta property="dcterms:modified">2011-01-01T12:00:00Z</meta>
 type PkgMeta struct {
 	Refines  string `xml:"refines,attr,omitempty"`
 	Property string `xml:"property,attr,omitempty"`
@@ -291,7 +293,12 @@ func (p *Pkg) AddCustomMeta(name, content string) {
 // ISBN or ISSN. If no identifier is set, a UUID will be automatically
 // generated.
 func (p *Pkg) AddIdentifier(identifier, typeSchema, typeContent string) {
-	id := fmt.Sprintf("%s%d", pkgIdentifierID, len(p.xml.Metadata.Identifier))
+	var id string
+	if len(p.xml.Metadata.Identifier) == 0 {
+		id = pkgIdentifierID
+	} else {
+		id = fmt.Sprintf("%s%d", pkgIdentifierID, len(p.xml.Metadata.Identifier))
+	}
 
 	p.xml.Metadata.Identifier = append(p.xml.Metadata.Identifier, PkgIdentifier{
 		ID:   id,
@@ -299,7 +306,7 @@ func (p *Pkg) AddIdentifier(identifier, typeSchema, typeContent string) {
 	})
 	meta := PkgMeta{
 		Refines:  "#" + id,
-		ID:       id,
+		ID:       "meta-" + id,
 		Property: PropertyIdentifierType,
 		Data:     typeContent,
 		Scheme:   typeSchema,
