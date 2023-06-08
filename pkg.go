@@ -245,7 +245,7 @@ func (p *Pkg) AddCreator(author, role string) {
 	})
 	meta := PkgMeta{
 		Refines:  "#" + id,
-		ID:       id,
+		ID:       "meta-" + id,
 		Property: PropertyRole,
 		Data:     role,
 		Scheme:   SchemeMARCRelators,
